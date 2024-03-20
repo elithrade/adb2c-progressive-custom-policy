@@ -20,12 +20,14 @@
         <DisplayName>Loyalty-Number</DisplayName>
         <DataType>string</DataType>
         <UserHelpText>Loyalty number from membership card</UserHelpText>
+        <!-- Used for user data collection -->
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
     </ClaimsSchema>
   </BuildingBlocks>
 
   <ClaimsProviders>
+
     <ClaimsProvider>
       <DisplayName>Local Account SignIn</DisplayName>
       <TechnicalProfiles>
@@ -41,6 +43,7 @@
         </TechnicalProfile>
       </TechnicalProfiles>
     </ClaimsProvider>
+
     <!-- Adding a new claim provider, a self asserted technical profile to collect loyalty number from user interface -->
     <ClaimsProvider>
       <DisplayName>Self Asserted</DisplayName>
@@ -49,6 +52,37 @@
         <TechnicalProfile Id="SelfAsserted-ProfileUpdate">
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="extension_LoyaltyNumber" Required="true"/>
+          </OutputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <!-- Adding a new claim provider that extends AAD-Common technical profile defined in the base -->
+    <ClaimsProvider>
+      <DisplayName>Azure Active Directory</DisplayName>
+      <TechnicalProfiles>
+        <!-- Defined in TrustFrameworkBase.xml -->
+        <TechnicalProfile Id="AAD-Common">
+        <!-- Extend AAD-Comment technical profile -->
+          <Metadata>
+            <!-- Allow this technical profile to work with custom claim -->
+            <!-- Object ID and client ID of the b2c-extension-app, used by ADB2C to store user data -->
+            <Item Key="ApplicationObjectId">86d63b87-1a4e-4095-8028-c8e19ac3d4c2</Item>
+            <Item Key="ClientId">99cbd9db-6657-4dc7-81c9-47398aa2de4d</Item>
+          </Metadata>
+        </TechnicalProfile>
+        <!-- Using existing technical profile defined in TrustFrameworkBase.xml -->
+        <!-- Persist the custom claim in -->
+        <TechnicalProfile Id="AAD-UserWriteProfileUsingObjectId">
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="extension_LoyaltyNumber"/>
+          </PersistedClaims>
+        </TechnicalProfile>
+        <!-- Using existing technical profile defined in TrustFrameworkBase.xml -->
+        <!-- Reads the custom claim back out -->
+        <TechnicalProfile Id="AAD-UserReadUsingObjectId">
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="extension_LoyaltyNumber"/>
           </OutputClaims>
         </TechnicalProfile>
       </TechnicalProfiles>
