@@ -29,6 +29,8 @@
         <OutputClaim ClaimTypeReferenceId="email" />
         <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>
         <OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+        <!-- Outputs loyaltyNumber to JWT token, the name is displayed as loyaltyNumber -->
+        <OutputClaim ClaimTypeReferenceId="extension_loyaltyNumber" DefaultValue="Unset" PartnerClaimType="loyaltyNumber" />
       </OutputClaims>
       <SubjectNamingInfo ClaimType="sub" />
     </TechnicalProfile>
