@@ -41,6 +41,18 @@
         </TechnicalProfile>
       </TechnicalProfiles>
     </ClaimsProvider>
+    <!-- Adding a new claim provider, a self asserted technical profile to collect loyalty number from user interface -->
+    <ClaimsProvider>
+      <DisplayName>Self Asserted</DisplayName>
+      <TechnicalProfiles>
+        <!-- Defined in TrustFrameworkBase.xml -->
+        <TechnicalProfile Id="SelfAsserted-ProfileUpdate">
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="extension_LoyaltyNumber" Required="true"/>
+          </OutputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
   </ClaimsProviders>
 
   <UserJourneys>
