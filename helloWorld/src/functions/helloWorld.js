@@ -10,8 +10,15 @@ app.http('helloWorld', {
             if (!name) {
                 return { status: 400, body: "Bad request" };
             }
+            context.log(`Passed in name is "${name}"`);
 
-            return { status: 200, body: `Hello ${name}!` };
+            const responseJson = {
+                "greeting": `Hello ${name}`
+            }
+            return {
+                status: 200,
+                jsonBody: responseJson
+            };
         } catch (error) {
             return { status: 500, body: error.message }
         }
