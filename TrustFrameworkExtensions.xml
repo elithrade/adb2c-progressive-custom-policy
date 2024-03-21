@@ -23,6 +23,10 @@
         <!-- Used for user data collection -->
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
+      <ClaimType Id="extension_HelloMessage">
+        <DisplayName>Hello-Message</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
     </ClaimsSchema>
   </BuildingBlocks>
 
@@ -52,6 +56,7 @@
         <TechnicalProfile Id="SelfAsserted-ProfileUpdate">
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="extension_LoyaltyNumber" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="extension_HelloMessage" Required="true"/>
           </OutputClaims>
         </TechnicalProfile>
       </TechnicalProfiles>
@@ -76,6 +81,7 @@
         <TechnicalProfile Id="AAD-UserWriteProfileUsingObjectId">
           <PersistedClaims>
             <PersistedClaim ClaimTypeReferenceId="extension_LoyaltyNumber"/>
+            <PersistedClaim ClaimTypeReferenceId="extension_HelloMessage"/>
           </PersistedClaims>
         </TechnicalProfile>
         <!-- Using existing technical profile defined in TrustFrameworkBase.xml -->
@@ -83,6 +89,31 @@
         <TechnicalProfile Id="AAD-UserReadUsingObjectId">
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="extension_LoyaltyNumber"/>
+            <OutputClaim ClaimTypeReferenceId="extension_HelloMessage"/>
+          </OutputClaims>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="CallHelloWorldApi">
+          <DisplayName>Calling external endpoint to get response and add response to token</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+              <!-- The ServiceUrl represents the API endpoint. Its value -->
+              <Item Key="ServiceUrl">https://helloworld-fa.azurewebsites.net/api/helloworld</Item>
+              <!-- SendClaimsIn specifies how the input claims are sent to the RESTful claims provider. Possible values: Body (default), Form, Header, Url or QueryString -->
+              <!-- When you use Body, such as in this article, you invoke the POST HTTP verb -->
+              <Item Key="SendClaimsIn">Body</Item>
+              <!-- AuthenticationType specifies the type of authentication that the RESTful claims provider performs. -->
+              <Item Key="AuthenticationType">None</Item>
+              <!-- Our RESTful claims provider calls an unprotected endpoint, so we set our AuthenticationType to None. If you set authentication type to Bearer, you need to add a CryptographicKeys element, which specifies the storage for your access token. -->
+              <Item Key="AllowInsecureAuthInProduction">true</Item>
+          </Metadata>
+          <InputClaims>
+              <!-- The PartnerClaimType attribute in the InputClaim specifies how you receive your data in the API. -->
+              <!-- Send givenName claim to API -->
+              <InputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="name" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="extension_HelloMessage" PartnerClaimType="greeting" />
           </OutputClaims>
         </TechnicalProfile>
       </TechnicalProfiles>
@@ -136,7 +167,14 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="5" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <!-- Calling HTTP API request technical profile -->
+        <OrchestrationStep Order="5" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="ExternalAPIExchange" TechnicalProfileReferenceId="CallHelloWorldApi" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
       </OrchestrationSteps>
       <ClientDefinition ReferenceId="DefaultWeb" />
     </UserJourney>
